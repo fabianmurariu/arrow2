@@ -10,11 +10,18 @@ use crate::{
     types::{days_ms, f16, i256, months_days_ns, NativeType},
 };
 
+#[cfg(feature = "parallel_iter")]
+use par_iter::ParDataIter;
+#[cfg(feature = "parallel_iter")]
+use rayon::prelude::IndexedParallelIterator;
+
 use super::Array;
 use either::Either;
 
 #[cfg(feature = "arrow")]
 mod data;
+#[cfg(feature = "parallel_iter")]
+mod par_iter;
 mod ffi;
 pub(super) mod fmt;
 mod from_natural;
@@ -146,6 +153,13 @@ impl<T: NativeType> PrimitiveArray<T> {
     #[inline]
     pub fn iter(&self) -> ZipValidity<&T, std::slice::Iter<T>, BitmapIter> {
         ZipValidity::new_with_validity(self.values().iter(), self.validity())
+    }
+
+    #[inline]
+    #[cfg(feature = "parallel_iter")]
+    /// Returns an iterator over the values and validity, `Option<T>`.
+    pub fn into_par_iter(self) -> impl IndexedParallelIterator<Item = Option<T>>{
+        ParDataIter::new(self)
     }
 
     /// Returns an iterator of the values, `&T`, ignoring the arrays' validity.

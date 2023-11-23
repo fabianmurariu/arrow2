@@ -66,4 +66,6 @@ impl DoubleEndedIterator for IntoIter {
     }
 }
 
+impl ExactSizeIterator for IntoIter {}
+
 unsafe impl TrustedLen for IntoIter {}

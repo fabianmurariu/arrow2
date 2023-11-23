@@ -67,3 +67,5 @@ impl<T: Copy> DoubleEndedIterator for IntoIter<T> {
 }
 
 unsafe impl<T: Copy> TrustedLen for IntoIter<T> {}
+
+impl <T:Copy> ExactSizeIterator for IntoIter<T> {}
